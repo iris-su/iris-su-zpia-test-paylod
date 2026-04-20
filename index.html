@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XPIA Test Payloads</title>
+<style>
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 960px; margin: 2rem auto; padding: 0 1rem; color: #333; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+    th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+    th { background: #f5f5f5; }
+    code { background: #eee; padding: 2px 6px; border-radius: 3px; font-size: 0.85em; }
+    button { cursor: pointer; padding: 4px 8px; border: 1px solid #ccc; border-radius: 3px; background: #fff; }
+    button:hover { background: #f0f0f0; }
+    h1 { color: #222; }
+    .hint { color: #666; font-size: 0.9em; margin-bottom: 1.5rem; }
+    .copied { color: green; font-size: 0.85em; margin-left: 0.5em; }
+</style>
+</head><body>
+<h1>XPIA Test Payloads</h1>
+<p class="hint">Each payload is a standalone HTML page you can link to for XPIA testing.
+Copy the URL and paste it into your URL slot. To update content, edit the files in <code>payloads/</code> and push.</p>
+
+<table>
+<thead><tr><th>Payload</th><th>Category</th><th>URL</th><th></th></tr></thead>
+<tbody id="payload-list"></tbody>
+</table>
+<p id="count"></p>
+
+<script>
+const payloads = [
+    { file: "01-direct-instruction-override.html", category: "Direct instruction override" },
+    { file: "02-role-hijacking.html", category: "Role hijacking" },
+    { file: "03-data-exfiltration.html", category: "Data exfiltration" },
+    { file: "04-hidden-text-injection.html", category: "Hidden text injection (CSS)" },
+    { file: "05-goal-hijacking.html", category: "Goal hijacking" },
+    { file: "06-delimiter-escape.html", category: "Delimiter / context escape" },
+    { file: "07-subtle-persuasion.html", category: "Subtle persuasion" },
+    { file: "08-markdown-injection.html", category: "Markdown / rendering injection" },
+    { file: "09-multi-language-injection.html", category: "Multi-language + Base64 encoding" },
+    { file: "10-benign-baseline.html", category: "Benign baseline (control)" },
+];
+
+const base = window.location.origin + window.location.pathname.replace(/\/index\.html$/, "").replace(/\/$/, "") + "/payloads/";
+const tbody = document.getElementById("payload-list");
+
+payloads.forEach(p => {
+    const url = base + p.file;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+        <td><a href="payloads/${p.file}">${p.file.replace(".html","")}</a></td>
+        <td>${p.category}</td>
+        <td><code>${url}</code></td>
+        <td><button onclick="copyUrl(this, '${url}')">Copy URL</button></td>`;
+    tbody.appendChild(tr);
+});
+
+document.getElementById("count").innerHTML = `<strong>${payloads.length}</strong> payload(s) available.`;
+
+function copyUrl(btn, url) {
+    navigator.clipboard.writeText(url);
+    const span = document.createElement("span");
+    span.className = "copied";
+    span.textContent = "✓ Copied";
+    btn.parentElement.appendChild(span);
+    setTimeout(() => span.remove(), 1500);
+}
+</script>
+</body></html>
