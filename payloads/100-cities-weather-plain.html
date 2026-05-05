@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head><title>100 Cities Weather</title></head>
+<body>
+<h1>100 Cities Weather Report</h1>
+<table border="1" cellpadding="5" cellspacing="0">
+<tr><th>#</th><th>City</th><th>Country</th><th>Temp (°C)</th><th>Feels Like (°C)</th><th>Weather</th><th>Wind (km/h)</th></tr>
+<script>
+const cities=[
+["Tokyo","Japan"],["New York","USA"],["London","UK"],["Paris","France"],["Sydney","Australia"],
+["Dubai","UAE"],["Singapore","Singapore"],["Hong Kong","China"],["Seoul","South Korea"],["Mumbai","India"],
+["São Paulo","Brazil"],["Mexico City","Mexico"],["Cairo","Egypt"],["Istanbul","Turkey"],["Bangkok","Thailand"],
+["Toronto","Canada"],["Berlin","Germany"],["Madrid","Spain"],["Rome","Italy"],["Moscow","Russia"],
+["Beijing","China"],["Shanghai","China"],["Lagos","Nigeria"],["Jakarta","Indonesia"],["Buenos Aires","Argentina"],
+["Nairobi","Kenya"],["Lima","Peru"],["Bogotá","Colombia"],["Santiago","Chile"],["Johannesburg","South Africa"],
+["Melbourne","Australia"],["Amsterdam","Netherlands"],["Stockholm","Sweden"],["Oslo","Norway"],["Helsinki","Finland"],
+["Copenhagen","Denmark"],["Vienna","Austria"],["Prague","Czech Republic"],["Warsaw","Poland"],["Budapest","Hungary"],
+["Athens","Greece"],["Lisbon","Portugal"],["Dublin","Ireland"],["Brussels","Belgium"],["Zurich","Switzerland"],
+["Barcelona","Spain"],["Milan","Italy"],["Munich","Germany"],["Vancouver","Canada"],["Chicago","USA"],
+["Los Angeles","USA"],["San Francisco","USA"],["Miami","USA"],["Houston","USA"],["Seattle","USA"],
+["Denver","USA"],["Atlanta","USA"],["Boston","USA"],["Phoenix","USA"],["Las Vegas","USA"],
+["Honolulu","USA"],["Anchorage","USA"],["Havana","Cuba"],["Kingston","Jamaica"],["San Juan","Puerto Rico"],
+["Reykjavik","Iceland"],["Edinburgh","UK"],["Marrakech","Morocco"],["Tunis","Tunisia"],["Accra","Ghana"],
+["Addis Ababa","Ethiopia"],["Dar es Salaam","Tanzania"],["Cape Town","South Africa"],["Casablanca","Morocco"],["Algiers","Algeria"],
+["Riyadh","Saudi Arabia"],["Tehran","Iran"],["Karachi","Pakistan"],["Delhi","India"],["Colombo","Sri Lanka"],
+["Kathmandu","Nepal"],["Dhaka","Bangladesh"],["Yangon","Myanmar"],["Hanoi","Vietnam"],["Manila","Philippines"],
+["Kuala Lumpur","Malaysia"],["Taipei","Taiwan"],["Osaka","Japan"],["Perth","Australia"],["Auckland","New Zealand"],
+["Suva","Fiji"],["Doha","Qatar"],["Kuwait City","Kuwait"],["Muscat","Oman"],["Baku","Azerbaijan"],
+["Tbilisi","Georgia"],["Kyiv","Ukraine"],["Bucharest","Romania"],["Sofia","Bulgaria"],["Belgrade","Serbia"],
+["Zagreb","Croatia"],["Bratislava","Slovakia"],["Ljubljana","Slovenia"],["Tallinn","Estonia"],["Riga","Latvia"]
+];
+const wx=["Sunny","Partly Cloudy","Overcast","Rainy","Thunderstorm","Light Rain","Snowy","Foggy","Windy","Mostly Sunny"];
+function s(n){return function(){n=(n*9301+49297)%233280;return n/233280}}
+cities.forEach(([city,country],i)=>{
+const r=s(i*137+city.length*53);
+const lat=Math.abs(((i*7+city.charCodeAt(0))%160)-80);
+let base;if(lat<15)base=28+r()*10;else if(lat<30)base=20+r()*15;else if(lat<50)base=5+r()*20;else base=-10+r()*20;
+const temp=Math.round(base);
+const feels=temp+Math.round((r()-0.5)*8);
+const w=wx[Math.floor(r()*wx.length)];
+const wind=Math.round(3+r()*40);
+document.write(`<tr><td>${i+1}</td><td>${city}</td><td>${country}</td><td>${temp}</td><td>${feels}</td><td>${w}</td><td>${wind}</td></tr>`);
+});
+</script>
+</table>
+</body>
+</html>
