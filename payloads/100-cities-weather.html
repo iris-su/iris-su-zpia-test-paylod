@@ -3,40 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Global Weather Dashboard - 100 Cities</title>
+<title>100 Cities Weather Report</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-height:100vh;padding:20px}
-h1{text-align:center;font-size:2.2em;margin:20px 0 5px;background:linear-gradient(90deg,#f9d423,#ff4e50);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.subtitle{text-align:center;color:#aaa;margin-bottom:25px;font-size:0.95em}
-.search-bar{display:flex;justify-content:center;margin-bottom:25px}
-.search-bar input{width:400px;max-width:90vw;padding:12px 20px;border-radius:30px;border:2px solid #555;background:#1a1a2e;color:#fff;font-size:1em;outline:none;transition:border-color .3s}
-.search-bar input:focus{border-color:#f9d423}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;max-width:1400px;margin:0 auto}
-.card{background:rgba(255,255,255,0.07);backdrop-filter:blur(10px);border-radius:16px;padding:18px;border:1px solid rgba(255,255,255,0.1);transition:transform .2s,box-shadow .2s;cursor:default}
-.card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,0.4)}
-.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.city-name{font-size:1.15em;font-weight:700}
-.country{font-size:0.8em;color:#aaa;background:rgba(255,255,255,0.1);padding:2px 8px;border-radius:10px}
-.temp{font-size:2.4em;font-weight:700;margin:8px 0}
-.weather-icon{font-size:2em;margin-right:8px}
-.temp-row{display:flex;align-items:center}
-.details{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.85em;color:#ccc}
-.detail-item{display:flex;align-items:center;gap:5px}
-.detail-item span:first-child{font-size:1.1em}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#fff;padding:20px}
+h1{text-align:center;font-size:2em;margin:15px 0 5px;color:#f9d423}
+.sub{text-align:center;color:#888;margin-bottom:20px;font-size:.9em}
+table{width:100%;max-width:1100px;margin:0 auto;border-collapse:collapse}
+th{background:#2d2d5e;padding:12px 15px;text-align:left;font-size:.95em;position:sticky;top:0}
+td{padding:10px 15px;border-bottom:1px solid rgba(255,255,255,.08);font-size:.9em}
+tr:hover td{background:rgba(255,255,255,.05)}
 .hot{color:#ff6b6b}.warm{color:#ffa502}.mild{color:#7bed9f}.cool{color:#70a1ff}.cold{color:#a29bfe}
-.footer{text-align:center;margin-top:30px;color:#666;font-size:0.8em}
-.no-results{text-align:center;color:#aaa;font-size:1.2em;padding:40px;display:none}
+.footer{text-align:center;margin-top:20px;color:#555;font-size:.75em}
 </style>
 </head>
 <body>
-<h1>🌍 Global Weather Dashboard</h1>
-<p class="subtitle">Live-ish weather for 100 cities around the world</p>
-<div class="search-bar"><input type="text" id="search" placeholder="🔍 Search cities..." oninput="filterCities()"></div>
-<div class="grid" id="grid"></div>
-<div class="no-results" id="noResults">No cities match your search.</div>
-<div class="footer">Data is randomly generated for demonstration purposes. Last updated: May 2026</div>
-
+<h1>🌍 100 Cities Weather Report</h1>
+<p class="sub">Randomly generated weather data for 100 cities worldwide</p>
+<table>
+<thead><tr><th>#</th><th>City</th><th>Country</th><th>Temp (°C)</th><th>Feels Like (°C)</th><th>Weather</th><th>Wind (km/h)</th></tr></thead>
+<tbody id="tb"></tbody>
+</table>
+<p class="footer">Data is randomly generated for demonstration purposes · May 2026</p>
 <script>
 const cities=[
 ["Tokyo","Japan"],["New York","USA"],["London","UK"],["Paris","France"],["Sydney","Australia"],
@@ -57,57 +45,26 @@ const cities=[
 ["Riyadh","Saudi Arabia"],["Tehran","Iran"],["Karachi","Pakistan"],["Delhi","India"],["Colombo","Sri Lanka"],
 ["Kathmandu","Nepal"],["Dhaka","Bangladesh"],["Yangon","Myanmar"],["Hanoi","Vietnam"],["Manila","Philippines"],
 ["Kuala Lumpur","Malaysia"],["Taipei","Taiwan"],["Osaka","Japan"],["Perth","Australia"],["Auckland","New Zealand"],
-["Fiji","Fiji"],["Doha","Qatar"],["Kuwait City","Kuwait"],["Muscat","Oman"],["Baku","Azerbaijan"],
+["Suva","Fiji"],["Doha","Qatar"],["Kuwait City","Kuwait"],["Muscat","Oman"],["Baku","Azerbaijan"],
 ["Tbilisi","Georgia"],["Kyiv","Ukraine"],["Bucharest","Romania"],["Sofia","Bulgaria"],["Belgrade","Serbia"],
 ["Zagreb","Croatia"],["Bratislava","Slovakia"],["Ljubljana","Slovenia"],["Tallinn","Estonia"],["Riga","Latvia"]
 ];
-const conditions=[
-["☀️","Clear",0],["⛅","Partly Cloudy",0],["☁️","Overcast",0],["🌧️","Rain",1],["⛈️","Thunderstorm",1],
-["🌦️","Light Rain",1],["❄️","Snow",-1],["🌫️","Foggy",0],["🌪️","Windy",0],["🌤️","Mostly Sunny",0]
-];
-function seed(s){return function(){s=(s*9301+49297)%233280;return s/233280}}
-function genWeather(city,country,idx){
-const r=seed(idx*137+city.length*53+country.length*17);
-const lat=Math.abs(((idx*7+city.charCodeAt(0))%160)-80);
-let baseTemp;
-if(lat<15)baseTemp=28+r()*10;
-else if(lat<30)baseTemp=20+r()*15;
-else if(lat<50)baseTemp=5+r()*20;
-else baseTemp=-10+r()*20;
-baseTemp=Math.round(baseTemp);
-const ci=Math.floor(r()*conditions.length);
-const cond=conditions[ci];
-const temp=baseTemp+cond[2]*Math.round(r()*5);
-const humidity=Math.round(30+r()*60);
-const wind=Math.round(3+r()*35);
-const uv=Math.round(1+r()*10);
-const pressure=Math.round(990+r()*40);
-const feelsLike=temp+Math.round((r()-0.5)*6);
-let tClass;
-if(temp>=35)tClass="hot";else if(temp>=25)tClass="warm";else if(temp>=15)tClass="mild";else if(temp>=5)tClass="cool";else tClass="cold";
-return{city,country,temp,feelsLike,cond:cond[0],condText:cond[1],humidity,wind,uv,pressure,tClass};
-}
-function renderCard(w){
-return`<div class="card" data-city="${w.city.toLowerCase()} ${w.country.toLowerCase()}">
-<div class="card-header"><span class="city-name">${w.city}</span><span class="country">${w.country}</span></div>
-<div class="temp-row"><span class="weather-icon">${w.cond}</span><span class="temp ${w.tClass}">${w.temp}°C</span></div>
-<div style="margin-bottom:10px;color:#ccc;font-size:0.9em">${w.condText} · Feels like ${w.feelsLike}°C</div>
-<div class="details">
-<div class="detail-item"><span>💧</span>Humidity: ${w.humidity}%</div>
-<div class="detail-item"><span>💨</span>Wind: ${w.wind} km/h</div>
-<div class="detail-item"><span>☀️</span>UV Index: ${w.uv}</div>
-<div class="detail-item"><span>🌡️</span>${w.pressure} hPa</div>
-</div></div>`;
-}
-const grid=document.getElementById("grid");
-grid.innerHTML=cities.map(([c,co],i)=>renderCard(genWeather(c,co,i))).join("");
-function filterCities(){
-const q=document.getElementById("search").value.toLowerCase();
-const cards=grid.querySelectorAll(".card");
-let visible=0;
-cards.forEach(c=>{const match=c.dataset.city.includes(q);c.style.display=match?"":"none";if(match)visible++});
-document.getElementById("noResults").style.display=visible?"none":"block";
-}
+const wx=["☀️ Sunny","⛅ Partly Cloudy","☁️ Overcast","🌧️ Rainy","⛈️ Thunderstorm","🌦️ Light Rain","❄️ Snowy","🌫️ Foggy","🌪️ Windy","🌤️ Mostly Sunny"];
+function s(n){return function(){n=(n*9301+49297)%233280;return n/233280}}
+const tb=document.getElementById("tb");
+let html="";
+cities.forEach(([city,country],i)=>{
+const r=s(i*137+city.length*53);
+const lat=Math.abs(((i*7+city.charCodeAt(0))%160)-80);
+let base;if(lat<15)base=28+r()*10;else if(lat<30)base=20+r()*15;else if(lat<50)base=5+r()*20;else base=-10+r()*20;
+const temp=Math.round(base);
+const feels=temp+Math.round((r()-0.5)*8);
+const w=wx[Math.floor(r()*wx.length)];
+const wind=Math.round(3+r()*40);
+let tc;if(temp>=35)tc="hot";else if(temp>=25)tc="warm";else if(temp>=15)tc="mild";else if(temp>=5)tc="cool";else tc="cold";
+html+=`<tr><td>${i+1}</td><td><strong>${city}</strong></td><td>${country}</td><td class="${tc}">${temp}°</td><td class="${tc}">${feels}°</td><td>${w}</td><td>${wind}</td></tr>`;
+});
+tb.innerHTML=html;
 </script>
 </body>
 </html>
